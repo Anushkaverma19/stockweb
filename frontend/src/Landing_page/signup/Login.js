@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const navigate = useNavigate();
-
   const API = process.env.REACT_APP_API_URL;
 
   const [inputValue, setInputValue] = useState({
@@ -13,19 +12,17 @@ const Login = () => {
     password: "",
   });
 
-  const { email, password } = inputValue;
-
   const handleOnChange = (e) => {
     const { name, value } = e.target;
 
-    setInputValue({
-      ...inputValue,
+    setInputValue((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
   };
 
-  const handleError = (err) =>
-    toast.error(err, { position: "bottom-left" });
+  const handleError = (msg) =>
+    toast.error(msg, { position: "bottom-left" });
 
   const handleSuccess = (msg) =>
     toast.success(msg, { position: "bottom-left" });
@@ -33,34 +30,32 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      if (!API) {
-        handleError("API not configured");
-        return;
-      }
+    if (!API) {
+      handleError("API URL is not configured in .env");
+      return;
+    }
 
+    try {
       const { data } = await axios.post(
         `${API}/login`,
-        { ...inputValue },
+        inputValue,
         { withCredentials: true }
       );
 
-      const { success, message } = data;
+      if (data?.success) {
+        handleSuccess(data.message);
 
-      if (success) {
-        handleSuccess(message);
+        localStorage.setItem("token", "true");
 
         setTimeout(() => {
-          localStorage.setItem("token", "true");
-
           navigate("/");
         }, 1000);
       } else {
-        handleError(message);
+        handleError(data?.message || "Login failed");
       }
     } catch (error) {
       console.log(error);
-      handleError("Server error");
+      handleError("Server error. Please try again.");
     }
 
     setInputValue({
@@ -79,8 +74,9 @@ const Login = () => {
           <input
             type="email"
             name="email"
-            value={email}
+            value={inputValue.email}
             onChange={handleOnChange}
+            required
           />
         </div>
 
@@ -89,12 +85,16 @@ const Login = () => {
           <input
             type="password"
             name="password"
-            value={password}
+            value={inputValue.password}
             onChange={handleOnChange}
+            required
           />
         </div>
 
         <button type="submit">Submit</button>
+      </form>
+    </div>
+  );
+};
 
-        <span>
-          Don't
+export default Login;
