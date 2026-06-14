@@ -4,30 +4,40 @@ import GeneralContext from "./GeneralContext";
 import "./BuyActionWindow.css";
 
 const BuyActionWindow = ({ uid }) => {
+
   const [stockQuantity, setStockQuantity] = useState(1);
   const [stockPrice, setStockPrice] = useState(0);
 
   const { closeBuyWindow } = useContext(GeneralContext);
 
+  const API = process.env.REACT_APP_API_URL;
+
   const handleBuyClick = async () => {
     console.log("BUY BUTTON CLICKED");
 
     try {
+      if (!API) {
+        alert("API URL missing");
+        return;
+      }
+
       const response = await axios.post(
-        "http://localhost:3002/newOrder",
+        `${API}/newOrder`,
         {
           name: uid,
           qty: Number(stockQuantity),
           price: Number(stockPrice),
           mode: "BUY",
-        }
+        },
+        { withCredentials: true }
       );
 
       console.log("Server Response:", response.data);
 
       alert("Order Saved Successfully!");
 
-      closeBuyWindow(); // save hone ke baad window close
+      closeBuyWindow();
+
     } catch (err) {
       console.log("ERROR:", err);
 

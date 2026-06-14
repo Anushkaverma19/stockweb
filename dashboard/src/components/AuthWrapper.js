@@ -3,13 +3,21 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function AuthWrapper({ children }) {
+
   const navigate = useNavigate();
+  const API = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        if (!API) {
+          console.log("API URL missing");
+          navigate("/login");
+          return;
+        }
+
         const { data } = await axios.post(
-          "http://localhost:3002/",
+          `${API}/`,
           {},
           { withCredentials: true }
         );
@@ -17,9 +25,9 @@ function AuthWrapper({ children }) {
         console.log("AUTH RESPONSE:", data);
 
         if (!data.status) {
-          console.log("User not authenticated");
           navigate("/login");
         }
+
       } catch (err) {
         console.log("AUTH ERROR:", err);
         navigate("/login");
@@ -27,7 +35,8 @@ function AuthWrapper({ children }) {
     };
 
     checkAuth();
-  }, [navigate]);
+
+  }, [navigate, API]);
 
   return children;
 }

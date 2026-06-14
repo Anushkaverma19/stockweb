@@ -6,6 +6,8 @@ import { ToastContainer, toast } from "react-toastify";
 const Login = () => {
   const navigate = useNavigate();
 
+  const API = process.env.REACT_APP_API_URL;
+
   const [inputValue, setInputValue] = useState({
     email: "",
     password: "",
@@ -32,8 +34,13 @@ const Login = () => {
     e.preventDefault();
 
     try {
+      if (!API) {
+        handleError("API not configured");
+        return;
+      }
+
       const { data } = await axios.post(
-        "http://localhost:3002/login",
+        `${API}/login`,
         { ...inputValue },
         { withCredentials: true }
       );
@@ -44,10 +51,8 @@ const Login = () => {
         handleSuccess(message);
 
         setTimeout(() => {
-          // ✅ store login state
           localStorage.setItem("token", "true");
 
-          // ✅ redirect to Zerodha home page (FIXED)
           navigate("/");
         }, 1000);
       } else {
@@ -92,13 +97,4 @@ const Login = () => {
         <button type="submit">Submit</button>
 
         <span>
-          Don't have an account? <Link to="/signup">Signup</Link>
-        </span>
-      </form>
-
-      <ToastContainer />
-    </div>
-  );
-};
-
-export default Login;
+          Don't

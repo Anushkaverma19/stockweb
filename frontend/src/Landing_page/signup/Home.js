@@ -9,6 +9,8 @@ const Home = () => {
   const [cookies, setCookie, removeCookie] = useCookies(["token"]);
   const [username, setUsername] = useState("");
 
+  const API = process.env.REACT_APP_API_URL;
+
   useEffect(() => {
     const verifyCookie = async () => {
       try {
@@ -17,8 +19,10 @@ const Home = () => {
           return;
         }
 
+        if (!API) return;
+
         const { data } = await axios.post(
-          "http://localhost:3002",   // ⚠️ FIX PORT
+          `${API}/`,
           {},
           { withCredentials: true }
         );
@@ -41,13 +45,13 @@ const Home = () => {
     };
 
     verifyCookie();
-  }, [cookies, navigate, removeCookie]);
+  }, [cookies, navigate, removeCookie, API]);
 
-  // ✅ FIXED LOGOUT (IMPORTANT)
+  // ✅ FIXED LOGOUT
   const Logout = async () => {
     try {
       await axios.post(
-        "http://localhost:3002/logout",
+        `${API}/logout`,
         {},
         { withCredentials: true }
       );

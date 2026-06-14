@@ -5,14 +5,20 @@ import { ToastContainer, toast } from "react-toastify";
 
 const Signup = () => {
   const navigate = useNavigate();
+
+  const API = process.env.REACT_APP_API_URL;
+
   const [inputValue, setInputValue] = useState({
     email: "",
     password: "",
     username: "",
   });
+
   const { email, password, username } = inputValue;
+
   const handleOnChange = (e) => {
     const { name, value } = e.target;
+
     setInputValue({
       ...inputValue,
       [name]: value,
@@ -23,6 +29,7 @@ const Signup = () => {
     toast.error(err, {
       position: "bottom-left",
     });
+
   const handleSuccess = (msg) =>
     toast.success(msg, {
       position: "bottom-right",
@@ -30,28 +37,38 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
+      if (!API) {
+        handleError("API not configured");
+        return;
+      }
+
       const { data } = await axios.post(
-        "http://localhost:3002/signup",
+        `${API}/signup`,
         {
           ...inputValue,
         },
         { withCredentials: true }
       );
+
       const { success, message } = data;
+
       if (success) {
         handleSuccess(message);
+
         setTimeout(() => {
-          navigate("/");
+          navigate("/login");
         }, 1000);
       } else {
         handleError(message);
       }
     } catch (error) {
       console.log(error);
+      handleError("Server error");
     }
+
     setInputValue({
-      ...inputValue,
       email: "",
       password: "",
       username: "",
@@ -61,9 +78,10 @@ const Signup = () => {
   return (
     <div className="form_container">
       <h2>Signup Account</h2>
+
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="email">Email</label>
+          <label>Email</label>
           <input
             type="email"
             name="email"
@@ -72,8 +90,9 @@ const Signup = () => {
             onChange={handleOnChange}
           />
         </div>
+
         <div>
-          <label htmlFor="email">Username</label>
+          <label>Username</label>
           <input
             type="text"
             name="username"
@@ -82,8 +101,9 @@ const Signup = () => {
             onChange={handleOnChange}
           />
         </div>
+
         <div>
-          <label htmlFor="password">Password</label>
+          <label>Password</label>
           <input
             type="password"
             name="password"
@@ -92,11 +112,14 @@ const Signup = () => {
             onChange={handleOnChange}
           />
         </div>
+
         <button type="submit">Submit</button>
+
         <span>
           Already have an account? <Link to={"/login"}>Login</Link>
         </span>
       </form>
+
       <ToastContainer />
     </div>
   );
