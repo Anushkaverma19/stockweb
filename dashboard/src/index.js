@@ -4,18 +4,25 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./index.css";
 
 import Home from "./components/Home";
-import AuthWrapper from "./components/AuthWrapper";
+import Login from "./components/Login"; // if exists
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <AuthWrapper>
-        <Routes>
-          <Route path="/*" element={<Home />} />
-        </Routes>
-      </AuthWrapper>
+      <Routes>
+
+        {/* PUBLIC LOGIN ROUTE */}
+        <Route path="/login" element={<Login />} />
+
+        {/* DASHBOARD (HOME AFTER LOGIN) */}
+        <Route path="/" element={<Home />} />
+
+        {/* fallback */}
+        <Route path="*" element={<Home />} />
+
+      </Routes>
     </BrowserRouter>
   </React.StrictMode>
 );
