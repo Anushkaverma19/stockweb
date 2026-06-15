@@ -17,7 +17,9 @@ const url = process.env.MONGO_URL;
 
 const app = express();
 
-// ✅ CORS FIX
+// =====================
+// CORS
+// =====================
 app.use(
   cors({
     origin: [
@@ -33,7 +35,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // =====================
-// ✅ API ROUTES FIRST
+// API ROUTES
 // =====================
 app.use("/auth", authRoute);
 
@@ -74,11 +76,12 @@ app.post("/newOrder", async (req, res) => {
 });
 
 // =====================
-// ✅ FRONTEND BUILD FIX (MOST IMPORTANT)
+// STATIC FRONTEND
 // =====================
 app.use(express.static(path.join(__dirname, "client/build")));
 
-app.get("*", (req, res) => {
+// ✅ FIXED SPA ROUTE (NO "*" BUG)
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, "client/build", "index.html"));
 });
 
