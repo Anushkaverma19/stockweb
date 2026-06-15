@@ -37,18 +37,20 @@ const Login = () => {
 
     try {
       const { data } = await axios.post(
-        `${API}/login`,
+        `${API}/auth/login`,
         inputValue,
-        { withCredentials: true }
+        {
+          withCredentials: true,
+        }
       );
 
       if (data?.success) {
-        handleSuccess(data.message);
+        handleSuccess(data.message || "Login successful");
 
-        // ✅ FIX 1: store real token from backend
-        localStorage.setItem("token", data.token);
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
 
-        // ✅ FIX 2: redirect to holdings (not /)
         setTimeout(() => {
           navigate("/holdings");
         }, 1000);
@@ -56,8 +58,11 @@ const Login = () => {
         handleError(data?.message || "Login failed");
       }
     } catch (error) {
-      console.log(error);
-      handleError("Server error. Please try again.");
+      console.error(error);
+      handleError(
+        error?.response?.data?.message ||
+          "Server error. Please try again."
+      );
     }
 
     setInputValue({
