@@ -1,25 +1,28 @@
-const { Signup, Login } = require('../Controllers/AuthController');
-const { userVerification } = require('../Middlewares/AuthMiddleware');
+const { Signup, Login } = require("../Controllers/AuthController");
+const { userVerification } = require("../Middlewares/AuthMiddleware");
 
-const router = require('express').Router();
+const router = require("express").Router();
 
-router.post('/signup', Signup);
-router.post('/login', Login);
-router.post('/', userVerification);
+// auth routes
+router.post("/signup", Signup);
+router.post("/login", Login);
 
-// ✅ ADD THIS LOGOUT ROUTE
-router.post('/logout', (req, res) => {
-  res.cookie('token', '', {
+// verify user
+router.post("/", userVerification);
+
+// ✅ LOGOUT (FIXED FOR PRODUCTION)
+router.post("/logout", (req, res) => {
+  res.cookie("token", "", {
     httpOnly: true,
     expires: new Date(0),
-    sameSite: 'lax',
-    secure: false,
-    path: '/'
+    sameSite: "none",
+    secure: true,
+    path: "/",
   });
 
   return res.json({
     status: true,
-    message: 'Logged out successfully'
+    message: "Logged out successfully",
   });
 });
 
