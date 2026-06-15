@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+const FRONTEND_URL = process.env.REACT_APP_FRONTEND_URL;
+const DASHBOARD_URL = process.env.REACT_APP_DASHBOARD_URL;
 
 function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -21,7 +23,7 @@ function Navbar() {
   const logout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
-    window.location.href = "http://localhost:3000";
+    window.location.href = FRONTEND_URL;
   };
 
   return (
@@ -43,12 +45,11 @@ function Navbar() {
 
             {isLoggedIn && (
               <>
-                <li className="nav-item">
-                  <Link className="nav-link" to="http://localhost:3001">
-                    Dashboard
-                  </Link>
-                </li>
-
+               <li className="nav-item">
+  <a className="nav-link" href={DASHBOARD_URL}>
+    Dashboard
+  </a>
+</li>
                 <li className="nav-item">
                   <span className="nav-link" style={{ cursor: "pointer" }} onClick={logout}>
                     Logout
