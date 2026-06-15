@@ -7,10 +7,10 @@ const router = require("express").Router();
 router.post("/signup", Signup);
 router.post("/login", Login);
 
-// verify user
-router.post("/", userVerification);
+// ✅ FIXED: proper verify route
+router.get("/verify", userVerification);
 
-// ✅ LOGOUT (FIXED FOR PRODUCTION)
+// logout
 router.post("/logout", (req, res) => {
   res.cookie("token", "", {
     httpOnly: true,

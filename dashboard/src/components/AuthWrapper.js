@@ -12,13 +12,12 @@ function AuthWrapper({ children }) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const { data } = await axios.post(
-          `${API}/`,
-          {},
+        const { data } = await axios.get(
+          `${API}/auth/verify`,
           { withCredentials: true }
         );
 
-        if (data.status) {
+        if (data.status === true) {
           setIsAuth(true);
         } else {
           setIsAuth(false);
@@ -35,10 +34,13 @@ function AuthWrapper({ children }) {
     checkAuth();
   }, [API, navigate]);
 
-  // 🔥 THIS is the key line that stops holdings flash
-  if (loading) return null; // or spinner
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-  if (!isAuth) return null;
+  if (!isAuth) {
+    return <div>Redirecting...</div>;
+  }
 
   return children;
 }
