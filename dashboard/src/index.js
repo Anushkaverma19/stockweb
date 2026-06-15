@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./index.css";
 
 import Home from "./components/Home";
-import Login from "./components/Login"; // if exists
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -13,13 +12,10 @@ root.render(
     <BrowserRouter>
       <Routes>
 
-        {/* PUBLIC LOGIN ROUTE */}
-        <Route path="/login" element={<Login />} />
-
-        {/* DASHBOARD (HOME AFTER LOGIN) */}
+        {/* DASHBOARD HOME (after login) */}
         <Route path="/" element={<Home />} />
 
-        {/* fallback */}
+        {/* fallback route */}
         <Route path="*" element={<Home />} />
 
       </Routes>
