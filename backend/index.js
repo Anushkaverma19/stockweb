@@ -4,7 +4,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const path = require("path");
 
 const HoldingsModel = require("./models/HoldingsModel");
 const PositionsModel = require("./models/PositionsModel");
@@ -23,8 +22,8 @@ const app = express();
 app.use(
   cors({
     origin: [
+      "https://stockweb-2.onrender.com",
       "https://stockweb-3.onrender.com",
-      "https://stockweb-2.onrender.com"
     ],
     credentials: true,
   })
@@ -35,14 +34,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // =====================
-// API ROUTES
+// AUTH ROUTES
 // =====================
 app.use("/auth", authRoute);
 
+// =====================
+// TEST ROUTE
+// =====================
 app.get("/test", (req, res) => {
   res.send("Backend Working");
 });
 
+// =====================
+// HOLDINGS
+// =====================
 app.get("/allHoldings", async (req, res) => {
   try {
     const allHoldings = await HoldingsModel.find({});
@@ -52,6 +57,9 @@ app.get("/allHoldings", async (req, res) => {
   }
 });
 
+// =====================
+// POSITIONS
+// =====================
 app.get("/allPositions", async (req, res) => {
   try {
     const allPositions = await PositionsModel.find({});
@@ -61,6 +69,9 @@ app.get("/allPositions", async (req, res) => {
   }
 });
 
+// =====================
+// NEW ORDER
+// =====================
 app.post("/newOrder", async (req, res) => {
   try {
     const newOrder = new OrdersModel(req.body);
@@ -73,16 +84,6 @@ app.post("/newOrder", async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-});
-
-// =====================
-// STATIC FRONTEND
-// =====================
-app.use(express.static(path.join(__dirname, "client/build")));
-
-// ✅ FIXED SPA ROUTE (NO "*" BUG)
-app.use((req, res) => {
-  res.sendFile(path.join(__dirname, "client/build", "index.html"));
 });
 
 // =====================
