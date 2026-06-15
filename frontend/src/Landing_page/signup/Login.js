@@ -43,18 +43,19 @@ const Login = () => {
           withCredentials: true,
         }
       );
+if (data?.success) {
+  handleSuccess(data.message || "Login successful");
 
-      if (data?.success) {
-        handleSuccess(data.message || "Login successful");
+  if (data.token) {
+    localStorage.setItem("token", data.token);
+  }
 
-        if (data.token) {
-          localStorage.setItem("token", data.token);
-        }
-
-        setTimeout(() => {
-          navigate("/holdings");
-        }, 1000);
-      } else {
+  // Force refresh so Navbar re-checks token
+  setTimeout(() => {
+    window.location.href = process.env.REACT_APP_FRONTEND_URL;
+  }, 1000);
+}
+       else {
         handleError(data?.message || "Login failed");
       }
     } catch (error) {
