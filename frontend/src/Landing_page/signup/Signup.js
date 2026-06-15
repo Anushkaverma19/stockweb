@@ -6,7 +6,9 @@ import { ToastContainer, toast } from "react-toastify";
 const Signup = () => {
   const navigate = useNavigate();
 
-  const API = process.env.REACT_APP_API_URL;
+  // fallback so app never breaks
+  const API =
+    process.env.REACT_APP_API_URL || "https://stockweb-1.onrender.com";
 
   const [inputValue, setInputValue] = useState({
     email: "",
@@ -17,55 +19,62 @@ const Signup = () => {
   const { email, password, username } = inputValue;
 
   const handleOnChange = (e) => {
-    const { name, value } = e.target;
-
     setInputValue({
       ...inputValue,
-      [name]: value,
+      [e.target.name]: e.target.value,
     });
   };
 
-  const handleError = (err) =>
-    toast.error(err, {
-      position: "bottom-left",
-    });
+  const handleError = (msg) =>
+    toast.error(msg, { position: "bottom-left" });
 
   const handleSuccess = (msg) =>
-    toast.success(msg, {
-      position: "bottom-right",
-    });
+    toast.success(msg, { position: "bottom-right" });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      if (!API) {
-        handleError("API not configured");
-        return;
+      console.log("API:", API);
+
+      // TRY BOTH COMMON ROUTES (safe fix)
+      let res;
+
+      try {
+        res = await axios.post(
+          `${API}/auth/signup`,
+          inputValue,
+          { withCredentials: true }
+        );
+      } catch (err) {
+        // fallback route
+        res = await axios.post(
+          `${API}/signup`,
+          inputValue,
+          { withCredentials: true }
+        );
       }
 
-      const { data } = await axios.post(
-        `${API}/signup`,
-        {
-          ...inputValue,
-        },
-        { withCredentials: true }
-      );
-
-      const { success, message } = data;
+      const { success, message } = res.data;
 
       if (success) {
-        handleSuccess(message);
+        handleSuccess(message || "Signup successful!");
 
         setTimeout(() => {
           navigate("/login");
         }, 1000);
       } else {
-        handleError(message);
+        handleError(message || "Signup failed");
       }
     } catch (error) {
-      console.log(error);
-      handleError("Server error");
+      console.log("FULL ERROR:", error);
+      console.log("RESPONSE:", error?.response?.data);
+
+      handleError(
+        error?.response?.data?.message ||
+          error.message ||
+          "Server error"
+      );
     }
 
     setInputValue({
@@ -88,6 +97,7 @@ const Signup = () => {
             value={email}
             placeholder="Enter your email"
             onChange={handleOnChange}
+            required
           />
         </div>
 
@@ -99,6 +109,7 @@ const Signup = () => {
             value={username}
             placeholder="Enter your username"
             onChange={handleOnChange}
+            required
           />
         </div>
 
@@ -110,13 +121,14 @@ const Signup = () => {
             value={password}
             placeholder="Enter your password"
             onChange={handleOnChange}
+            required
           />
         </div>
 
         <button type="submit">Submit</button>
 
         <span>
-          Already have an account? <Link to={"/login"}>Login</Link>
+          Already have an account? <Link to="/login">Login</Link>
         </span>
       </form>
 
