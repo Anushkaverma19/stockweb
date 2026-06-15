@@ -45,7 +45,7 @@ const Login = () => {
         handleSuccess("Login successful");
 
         setTimeout(() => {
-          window.location.href = "https://stockweb-2.onrender.com";
+          window.location.href = "https://stockweb-3.onrender.com";
         }, 1000);
       } else {
         handleError(data.message);
