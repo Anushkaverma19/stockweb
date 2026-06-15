@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 const Login = () => {
-  const navigate = useNavigate();
   const API = process.env.REACT_APP_API_URL;
 
   const [inputValue, setInputValue] = useState({
@@ -31,11 +29,14 @@ const Login = () => {
     e.preventDefault();
 
     if (!API) {
-      handleError("API URL is not configured in .env");
+      handleError("API URL is not configured");
       return;
     }
 
     try {
+      console.log("API URL:", API);
+      console.log("Login URL:", `${API}/auth/login`);
+
       const { data } = await axios.post(
         `${API}/auth/login`,
         inputValue,
@@ -43,33 +44,36 @@ const Login = () => {
           withCredentials: true,
         }
       );
-if (data?.success) {
-  handleSuccess(data.message || "Login successful");
 
-  if (data.token) {
-    localStorage.setItem("token", data.token);
-  }
+      console.log("Login Response:", data);
 
-  // Force refresh so Navbar re-checks token
-  setTimeout(() => {
-    window.location.href = process.env.REACT_APP_FRONTEND_URL;
-  }, 1000);
-}
-       else {
+      if (data?.success) {
+        handleSuccess(data.message || "Login successful");
+
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+          console.log("Token Saved:", data.token);
+        } else {
+          console.log("No token received from backend");
+        }
+
+        setTimeout(() => {
+          window.location.href =
+            process.env.REACT_APP_FRONTEND_URL ||
+            "https://stockweb-2.onrender.com";
+        }, 1000);
+      } else {
         handleError(data?.message || "Login failed");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Login Error:", error);
+      console.error("Backend Response:", error?.response?.data);
+
       handleError(
         error?.response?.data?.message ||
           "Server error. Please try again."
       );
     }
-
-    setInputValue({
-      email: "",
-      password: "",
-    });
   };
 
   return (
@@ -99,7 +103,7 @@ if (data?.success) {
           />
         </div>
 
-        <button type="submit">Submit</button>
+        <button type="submit">Login</button>
       </form>
     </div>
   );
