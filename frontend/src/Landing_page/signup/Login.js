@@ -28,15 +28,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!API) {
-      handleError("API URL is not configured");
-      return;
-    }
-
     try {
-      console.log("API URL:", API);
-      console.log("Login URL:", `${API}/auth/login`);
-
       const { data } = await axios.post(
         `${API}/auth/login`,
         inputValue,
@@ -47,32 +39,20 @@ const Login = () => {
 
       console.log("Login Response:", data);
 
-      if (data?.success) {
-        handleSuccess(data.message || "Login successful");
+      if (data.success) {
+        localStorage.setItem("token", data.token);
 
-        if (data.token) {
-          localStorage.setItem("token", data.token);
-          console.log("Token Saved:", data.token);
-        } else {
-          console.log("No token received from backend");
-        }
+        handleSuccess("Login successful");
 
         setTimeout(() => {
-          window.location.href =
-            process.env.REACT_APP_FRONTEND_URL ||
-            "https://stockweb-2.onrender.com";
+          window.location.href = "https://stockweb-2.onrender.com";
         }, 1000);
       } else {
-        handleError(data?.message || "Login failed");
+        handleError(data.message);
       }
     } catch (error) {
-      console.error("Login Error:", error);
-      console.error("Backend Response:", error?.response?.data);
-
-      handleError(
-        error?.response?.data?.message ||
-          "Server error. Please try again."
-      );
+      console.error(error);
+      handleError("Login failed");
     }
   };
 
@@ -103,7 +83,7 @@ const Login = () => {
           />
         </div>
 
-        <button type="submit">Login</button>
+        <button type="submit">Submit</button>
       </form>
     </div>
   );
