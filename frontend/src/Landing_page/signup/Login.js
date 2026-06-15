@@ -45,10 +45,12 @@ const Login = () => {
       if (data?.success) {
         handleSuccess(data.message);
 
-        localStorage.setItem("token", "true");
+        // ✅ FIX 1: store real token from backend
+        localStorage.setItem("token", data.token);
 
+        // ✅ FIX 2: redirect to holdings (not /)
         setTimeout(() => {
-          navigate("/");
+          navigate("/holdings");
         }, 1000);
       } else {
         handleError(data?.message || "Login failed");
