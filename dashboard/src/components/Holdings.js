@@ -29,6 +29,9 @@ const Holdings = () => {
       {
         label: "Stock Price",
         data: allHoldings.map((stock) => stock.price),
+           backgroundColor: "pink",
+      borderColor: "hotpink",
+      borderWidth: 1,
       },
     ],
   };
